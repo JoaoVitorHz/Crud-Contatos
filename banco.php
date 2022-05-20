@@ -8,7 +8,7 @@ class banco {
     }
 
     public function cadastro($nome, $sobrenome, $telefone1, $telefone2, $email1, $email2='', $cpf){
-        if($this->existeItem($telefone1) == false) {
+        if($this->existeItem($telefone1) == false && is_numeric($telefone1) && is_numeric($telefone2)){
 
             if($this->validateEmail($email1, $email2)) {
 
@@ -53,21 +53,6 @@ class banco {
         }
     }
 
-    public function getNome($nome){
-		$sql = "SELECT * FROM contatos WHERE nome = :nome";
-		$sql = $this->pdo->prepare($sql);
-		$sql->bindValue(':nome', $nome);
-		$sql->execute();
-
-		if($sql->rowCount() > 0) {
-			$info = $sql->fetch();
-
-			return $info['nome'];
-		} else {
-			return '';
-		}
-	}
-
     public function getAll(){
         $sql = "SELECT * FROM pessoa";
 
@@ -78,6 +63,48 @@ class banco {
 		} else {
 			return array();
 		}
+    }
+
+    public function editar($id, $nome, $sobrenome, $telefone1, $telefone2, $email1, $email2, $cpf) {
+        if($this->validateEmail($email1, $email2)) {
+
+            if(strlen($cpf) == 11 && is_numeric($cpf) == 1){
+                if($this->validarNome($nome, $sobrenome)){
+
+                    if(is_numeric($telefone1) && is_numeric($telefone2) && strlen($telefone1 ) >= 9 && strlen($telefone1 )<= 11 ){
+
+                        $sql = "UPDATE pessoa SET nome = :nome, sobrenome = :sobrenome, telefone1 = :telefone1, telefone2 = :telefone2, email1 = :email1, email2 = :email2, cpf = :cpf WHERE id = :id";
+
+                        $sql = $this->pdo->prepare($sql);
+                        $sql->bindValue(':id', $id);
+                        $sql->bindValue(':nome', $nome);
+                        $sql->bindValue(':sobrenome', $sobrenome);
+                        $sql->bindValue(':telefone1', $telefone1);
+                        $sql->bindValue(':telefone2', $telefone2);
+                        $sql->bindValue(':email1', $email1);
+                        $sql->bindValue(':email2', $email2);
+                        $sql->bindValue(':cpf', $cpf);
+                        $sql->execute();
+                        return true;
+                    } else {
+                        echo "Telefone esta invalido";
+                    }
+                } else {
+                    echo "Nome invalido";
+                }
+            } else {
+                echo "CPF invalido!";
+            }
+        } else {
+            echo "Contato já existente!";
+        }
+	} 
+
+    public function excluir($id){
+        $sql = "DELETE FROM pessoa WHERE id = :id";
+        $sql = $this->pdo->prepare($sql);
+        $sql->bindValue(':id', $id);
+        $sql->execute();
     }
 
     private function existeItem($telefone1){
@@ -99,7 +126,7 @@ class banco {
         }   
     }
 
-    public function validateEmail($email1, $email2 = ''){
+    private function validateEmail($email1, $email2 = ''){
         if(filter_var($email1, FILTER_VALIDATE_EMAIL) && filter_var($email2, FILTER_VALIDATE_EMAIL)){
         return true;
         } else {
@@ -160,40 +187,4 @@ class banco {
             return false;
         }
     }
-    public function editar($id, $nome, $sobrenome, $telefone1, $telefone2, $email1, $email2, $cpf) {
-        if($this->validateEmail($email1, $email2)) {
-
-            if(strlen($cpf) == 11 && is_numeric($cpf) == 1){
-                if($this->validarNome($nome, $sobrenome)){
-
-                    $sql = "UPDATE pessoa SET nome = :nome, sobrenome = :sobrenome, telefone1 = :telefone1, telefone2 = :telefone2, email1 = :email1, email2 = :email2, cpf = :cpf WHERE id = :id";
-
-                    $sql = $this->pdo->prepare($sql);
-                    $sql->bindValue(':id', $id);
-                    $sql->bindValue(':nome', $nome);
-                    $sql->bindValue(':sobrenome', $sobrenome);
-                    $sql->bindValue(':telefone1', $telefone1);
-                    $sql->bindValue(':telefone2', $telefone2);
-                    $sql->bindValue(':email1', $email1);
-                    $sql->bindValue(':email2', $email2);
-                    $sql->bindValue(':cpf', $cpf);
-                    $sql->execute();
-                    return true;
-                } else {
-                    "Nome invalido";
-                }
-            } else {
-                echo "CPF invalido!";
-            }
-        } else {
-            echo "Contato já existente!";
-        }
-	} 
-    public function excluir($id){
-        $sql = "DELETE FROM pessoa WHERE id = :id";
-        $sql = $this->pdo->prepare($sql);
-        $sql->bindValue(':id', $id);
-        $sql->execute();
-    }
-
 }

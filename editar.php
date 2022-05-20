@@ -4,23 +4,26 @@ $contato = new banco();
 
 $id = $_GET['id'];
 $info = $contato->getInfo($id);
-
-if(empty($_GET['id'])){
- 
-
-   
-
-    if(empty($info['email'])){
-       //header("Location:index.php");
-    }
-}else{
-   //header("Location:index.php");
-}
 ?>
 
-<h1>Editar</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Editar</title>
 
-<form method="POST" action="">
+   <link rel="stylesheet" href="css/editar.css">
+</head>
+<body>
+   <section>
+
+   <div class="header">
+            <h1>formulario<h1>
+            <a href="index.php">Listagem</a>
+        </div>
+
+        <form method="POST" action="">
    <input type="hidden" name="id" value="<?php echo $info['id']; ?>" />
 
    Nome:<br/>
@@ -43,8 +46,12 @@ if(empty($_GET['id'])){
    CPF:<br/>
    <input type="text" name="cpf" value="<?php echo $info['CPF']; ?>" /><br/><br/>
 
-   <input type="submit"value="Salvar"/>
+   <button type="submit">Editar</button>
 </form>
+
+   </section>
+</body>
+</html>
 
 <?php
 $contato = new banco();
@@ -60,8 +67,8 @@ if(!empty($_POST['id'])){
     $cpf = $_POST['cpf'];
    
 
-   $contato->editar($id, $nome, $sobrenome, $telefone1, $telefone2, $email1, $email2, $cpf);
-
+   if($contato->editar($id, $nome, $sobrenome, $telefone1, $telefone2, $email1, $email2, $cpf)){
     header("Location:index.php");
+   }
 }
    ?>
